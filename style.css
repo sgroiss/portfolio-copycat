@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sg-primary: #2b022d;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+
+  /* Text scale */
+  --fluid-screen: 100vw;
+  --fluid-bp: calc((var(--fluid-screen) - 20rem) / 1600);
+  --step--2: calc(0.87375rem + -0.6 * var(--fluid-bp));
+  --step--1: calc(0.934375rem + 0.57 * var(--fluid-bp));
+  --step-0: calc(1rem + 2 * var(--fluid-bp));
+  --step-1: calc(1.07rem + 3.76 * var(--fluid-bp));
+  --step-2: calc(1.145rem + 5.9 * var(--fluid-bp));
+  --step-3: calc(1.225rem + 8.5 * var(--fluid-bp));
+  --step-4: calc(1.310625rem + 11.62 * var(--fluid-bp));
+  --step-5: calc(1.4025rem + 15.37 * var(--fluid-bp));
+  --step-6: calc(1.500625rem + 19.85 * var(--fluid-bp));
+  --step-7: calc(1.605625rem + 25.18 * var(--fluid-bp));
+  --step-8: calc(1.718125rem + 31.52 * var(--fluid-bp));
+  --step-9: calc(1.83875rem + 39.03 * var(--fluid-bp));
+  --step-10: calc(1.966875rem + 47.94 * var(--fluid-bp));
+}
+
+@font-face {
+  font-family: "DM Sans Variable";
+  src: url("/assets/fonts/DM_Sans/DMSans-VariableFont_opsz,wght.woff2")
+    format("woff2");
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Variable";
+  src: url("/assets/fonts/Geist/Geist-VariableFont_wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "Geist Variable", sans-serif;
+  font-weight: 300;
+}
+
+#main-nav nav {
+  font-family: "Geist Variable", sans-serif;
+  letter-spacing: 0.05em;
+}
+
+h1 {
+  font-family: "DM Sans Variable", sans-serif;
+  font-weight: 500;
+}
+h2 {
+  font-family: "DM Sans Variable", sans-serif;
+  font-weight: 250;
+}
+
+p {
+  margin-bottom: 1em;
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+section {
+  overflow: hidden;
+  will-change: transform;
+}
+
+.is-grid {
+  grid-column-gap: 1em;
+  grid-row-gap: 1em;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-columns: 1fr;
+  align-items: start;
+  display: grid;
+}
+
+/* Marquee */
+#intro-marquee {
+  white-space: nowrap;
+}
+
+/* RES HELPER -------------------------------------------- */
+#res-helper {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: #000;
+  z-index: 333;
+}
+@media (min-width: 640px) {
+  #res-helper {
+    display: block;
+  }
+  #res-helper::before {
+    display: block;
+    content: "SM";
+  }
+}
+@media (min-width: 768px) {
+  #res-helper::before {
+    content: "MD";
+  }
+}
+@media (min-width: 1024px) {
+  #res-helper::before {
+    content: "LG";
+  }
+}
+@media (min-width: 1280px) {
+  #res-helper::before {
+    content: "XL";
+  }
+}
+@media (min-width: 1536px) {
+  #res-helper::before {
+    content: "2XL";
+  }
+}

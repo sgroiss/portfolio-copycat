@@ -1,0 +1,46 @@
+# --- Node ---
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Build output ---
+
+dist/
+out/
+\*.log
+
+# --- Environment files ---
+
+.env
+.env.\*
+!.env.example
+
+# --- Editor / System ---
+
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+
+# --- OS metadata ---
+
+.AppleDouble
+.LSOverride
+
+# --- ServBay or local tools ---
+
+.servbay/
+
+# --- Optional: caches ---
+
+.cache/
+
+# --- Project assets to ignore ---
+
+\_DATA/
+_.psd
+_.tif
+\*.ai
