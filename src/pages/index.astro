@@ -1,0 +1,71 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Project from "../components/Project.astro";
+import { getCollection } from "astro:content";
+
+const allProjects = await getCollection("projects");
+// optional sortieren nach "order"
+const projects = allProjects
+  .filter((entry) => entry.data.featured !== false)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+---
+
+<Layout title="Simon Groiss">
+  <Header />
+
+  <main class="static">
+    <Hero />
+
+    <section
+      id="projects"
+      data-overlap-previous
+      data-overlap-speed="0.6"
+      class="bg-black flex flex-col"
+    >
+      <div class="container mx-auto text-white py-16">
+        <div class="flex justify-between items-baseline w-full mb-16">
+          <h2 class="text-5xl">Projects</h2>
+          <a href="#" class="text-white underline text-lg">View all</a>
+        </div>
+
+        <div class="grid gap-x-10 gap-y-40 md:grid-cols-2">
+          {
+            projects.map((entry, index) => {
+              const isWide = (index + 1) % 3 === 0; // jedes 3. Projekt = breit
+              const wideBlockIndex = Math.floor((index + 1) / 3); // 1,2,3,...
+              const alignRight = isWide && wideBlockIndex % 2 === 0; // jede 2. breite Reihe rechts
+
+              const wrapperClass = [
+                "block",
+                isWide ? "md:col-span-2" : "",
+                isWide
+                  ? alignRight
+                    ? "md:ml-auto md:max-w-[72%]"
+                    : "md:mr-auto md:max-w-[72%]"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              return (
+                <div class={wrapperClass}>
+                  <a href={`/projects/${entry.slug}`} class="block">
+                    <Project
+                      id={entry.slug}
+                      title={entry.data.title}
+                      desc={entry.data.desc}
+                      img={entry.data.img}
+                      imgWidth={isWide ? 1400 : 700}
+                    />
+                  </a>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

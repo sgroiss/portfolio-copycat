@@ -1,0 +1,23 @@
+---
+const { title = "Simon Groiss" } = Astro.props;
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content="Astro 5 + Vite + TailwindCSS" />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body class="overflow-x-hidden bg-sg-primary/0 text-white antialiased">
+    <slot />
+    <script>
+      import "../scripts/main.js";
+    </script>
+    <div id="res-helper"></div>
+  </body>
+</html>

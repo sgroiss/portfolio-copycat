@@ -1,0 +1,57 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Project from "../../components/Project.astro";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+type ProjectEntry = CollectionEntry<"projects">;
+
+// 1. Alle statischen Pfade für /projects/[slug] erzeugen
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+  }));
+}
+
+// 2. Aktuellen Eintrag anhand des Slugs holen
+const { slug } = Astro.params;
+
+const allProjects = await getCollection("projects");
+const project = allProjects.find((p) => p.slug === slug) as
+  | ProjectEntry
+  | undefined;
+
+if (!project) {
+  throw new Error(`Project not found for slug: ${slug}`);
+}
+
+const { Content } = await project.render();
+---
+
+<Layout title={`${project.data.title} – Simon Groiss`}>
+  <main class="bg-black text-white min-h-screen">
+    <section class="container mx-auto py-16 space-y-10">
+      <!-- Back-Link -->
+      <a
+        href="/#projects"
+        class="inline-flex items-center text-sm text-gray-400 hover:text-white hover:underline"
+      >
+        ← Back to projects
+      </a>
+
+      <!-- Hero / Projekt-Teaser -->
+      <Project
+        id={project.slug}
+        title={project.data.title}
+        desc={project.data.desc}
+        img={project.data.img}
+      />
+
+      <!-- Langer Case-Text aus dem Markdown-Body -->
+      <article class="max-w-3xl space-y-4 leading-relaxed text-gray-200">
+        <Content />
+      </article>
+    </section>
+  </main>
+</Layout>

@@ -1,0 +1,39 @@
+---
+const {
+  id = "not-set",
+  title = "Project not-set",
+  desc = "not set",
+  img = null,
+  imgAlt = title,
+  imgWidth = null,
+} = Astro.props;
+---
+
+<article itemscope itemtype="https://schema.org/CreativeWork">
+  {
+    img && (
+      <img
+        src={img}
+        alt={imgAlt}
+        itemprop="image"
+        class={[
+          "mb-4 rounded-xs",
+          imgWidth ? "" : "w-48", // Fallback wenn keine Breite übergeben wurde
+        ].join(" ")}
+        width={imgWidth ?? undefined}
+      />
+    )
+  }
+
+  <h1 id={`project-${id}`} itemprop="headline" class="text-lg uppercase">
+    {title}
+  </h1>
+
+  <p
+    id={`project-${id}-desc`}
+    itemprop="description"
+    class="text-sm -mt-1 text-sg-secondary"
+  >
+    {desc}
+  </p>
+</article>
