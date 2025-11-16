@@ -8,8 +8,8 @@ role:
   - "Art Direction"
   - "Packaging Design"
 featured: true
-order: 1
-overlayColor: "#a27c5f" # Beispiel – frei wählbar
+order: 5
+overlayColor: "#090f2b" # Beispiel – frei wählbar
 ---
 
 Hier könnte später ein längerer Case-Text stehen – für eine Detailseite.

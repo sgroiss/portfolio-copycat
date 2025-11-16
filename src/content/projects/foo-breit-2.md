@@ -8,8 +8,8 @@ role:
   - "Concept"
   - "Motion Design"
 featured: true
-order: 3
-overlayColor: "#767670" # Beispiel – frei wählbar
+order: 6
+overlayColor: "#090f2b" # Beispiel – frei wählbar
 ---
 
 Kurze Beschreibung, später evtl. ausbauen.

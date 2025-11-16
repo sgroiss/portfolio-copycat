@@ -29,8 +29,80 @@
   --step-8: calc(1.718125rem + 31.52 * var(--fluid-bp));
   --step-9: calc(1.83875rem + 39.03 * var(--fluid-bp));
   --step-10: calc(1.966875rem + 47.94 * var(--fluid-bp));
+  /* vereinfachte fluid Spacing-Werte  */
+  --space-s: calc(1rem + 2 * var(--fluid-bp));
+  --space-l: calc(3rem + 6 * var(--fluid-bp));
+
+  /* Container & Grid */
+  --container-padding: var(--space-s);
+  --gutter: 16px;
+}
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: var(--space-l);
 }
 
+/* Standard-Karte: nimmt auf Desktop 6 von 12 Spalten, auf Mobile volle Breite */
+.work-item {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .work-item {
+    grid-column: span 6;
+  }
+}
+
+/* „Breite“ Karte: nimmt die ganze Breite ein (später können wir Offsets einbauen) */
+.work-item--wide {
+  grid-column: 1 / -1;
+}
+
+/* Offsets für „breite“ Items */
+.work-item--wide-left {
+  grid-column: 1 / span 10;
+}
+
+.work-item--wide-right {
+  grid-column: 3 / span 10;
+}
+
+/* ===== Tailwind v4: eigene Utilities ===== */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  width: 100%;
+  max-width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+@media (min-width: 600px) {
+  .container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1800px;
+  }
+}
+
+/* Variable-Font Utilities (optional) */
+@utility wght-300 {
+  font-variation-settings: "wght" 300;
+}
+@utility wght-500 {
+  font-variation-settings: "wght" 500;
+}
+@utility wght-700 {
+  font-variation-settings: "wght" 700;
+}
+
+/* ===== Globale Styles ===== */
 @font-face {
   font-family: "DM Sans Variable";
   src: url("/fonts/DM_Sans/DMSans-VariableFont_opsz,wght.woff2") format("woff2");
@@ -77,19 +149,26 @@ section {
   will-change: transform;
 }
 
-.is-grid {
-  grid-column-gap: 1em;
-  grid-row-gap: 1em;
-  grid-template-rows: auto;
-  grid-template-columns: repeat(12, 1fr);
-  grid-auto-columns: 1fr;
-  align-items: start;
-  display: grid;
+/* Project-Image Marquee ---------------------------------------- */
+.project-marquee {
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-/* Marquee */
-#intro-marquee {
-  white-space: nowrap;
+.project-marquee__inner {
+  display: inline-block;
+  padding-inline: 2rem;
+  animation: project-marquee 8s linear infinite;
+}
+
+/* Geschwindigkeit / Distanz kannst du später feinjustieren */
+@keyframes project-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* RES HELPER -------------------------------------------- */
@@ -132,48 +211,4 @@ section {
   #res-helper::before {
     content: "2XL";
   }
-}
-
-/* ===== Tailwind v4: eigene Utilities ===== */
-@utility container {
-  margin-inline: auto;
-  padding-inline: 1rem;
-  width: 100%;
-  max-width: 100%;
-}
-@media (min-width: 600px) {
-  .container {
-    max-width: 600px;
-  }
-}
-@media (min-width: 728px) {
-  .container {
-    max-width: 728px;
-  }
-}
-@media (min-width: 984px) {
-  .container {
-    max-width: 984px;
-  }
-}
-@media (min-width: 1240px) {
-  .container {
-    max-width: 1240px;
-  }
-}
-@media (min-width: 1800px) {
-  .container {
-    max-width: 1800px;
-  }
-}
-
-/* Variable-Font Utilities (optional) */
-@utility wght-300 {
-  font-variation-settings: "wght" 300;
-}
-@utility wght-500 {
-  font-variation-settings: "wght" 500;
-}
-@utility wght-700 {
-  font-variation-settings: "wght" 700;
 }

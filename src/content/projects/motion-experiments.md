@@ -9,6 +9,7 @@ role:
   - "Motion Design"
 featured: true
 order: 2
+overlayColor: "#959595" # Beispiel – frei wählbar
 ---
 
 Kurze Beschreibung, später evtl. ausbauen.

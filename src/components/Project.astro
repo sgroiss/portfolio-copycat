@@ -5,23 +5,32 @@ const {
   desc = "not set",
   img = null,
   imgAlt = title,
-  imgWidth = null,
+  overlayColor = null,
 } = Astro.props;
+const marqueeText = `${title} — ${title} — ${title} — ${title} — ${title} — ${title}`;
 ---
 
-<article itemscope itemtype="https://schema.org/CreativeWork">
+<article
+  itemscope
+  itemtype="https://schema.org/CreativeWork"
+  class="project-card"
+>
   {
     img && (
-      <img
-        src={img}
-        alt={imgAlt}
-        itemprop="image"
-        class={[
-          "mb-4 rounded-xs",
-          imgWidth ? "" : "w-48", // Fallback wenn keine Breite übergeben wurde
-        ].join(" ")}
-        width={imgWidth ?? undefined}
-      />
+      <div class="relative mb-4 rounded-xs overflow-hidden">
+        <img src={img} alt={imgAlt} itemprop="image" class="block w-full" />
+
+        {overlayColor && (
+          <div
+            class="project-overlay absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center overflow-hidden"
+            style={`background-color: ${overlayColor}`}
+          >
+            <div class="project-marquee w-full">
+              <div class="project-marquee__inner text-6xl">{marqueeText}</div>
+            </div>
+          </div>
+        )}
+      </div>
     )
   }
 

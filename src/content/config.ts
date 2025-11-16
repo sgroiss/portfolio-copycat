@@ -11,6 +11,7 @@ const projects = defineCollection({
     role: z.array(z.string()).optional(),
     featured: z.boolean().optional().default(true),
     order: z.number().optional(),
+    overlayColor: z.string().optional(),
   }),
 });
 

@@ -32,6 +32,9 @@
         "order": {
           "type": "number"
         },
+        "overlayColor": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

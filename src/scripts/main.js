@@ -82,8 +82,6 @@ function initAnchorScroll() {
     'a[data-anchor-scroll="true"][href^="#"]',
   );
 
-  console.log("anchor-links found:", links.length);
-
   links.forEach((link) => {
     link.addEventListener("click", (event) => {
       const href = link.getAttribute("href");
@@ -93,7 +91,6 @@ function initAnchorScroll() {
       if (!target) return;
 
       event.preventDefault();
-      console.log("lenis scrollTo →", href);
 
       lenis.scrollTo(target, {
         duration: 1.2,
@@ -119,8 +116,6 @@ function initPageAnimations() {
 
 // Start nur im Browser + View-Transition aware
 if (typeof window !== "undefined") {
-  console.log("MAIN.js (client)");
-
   gsap.registerPlugin(ScrollTrigger, SplitText);
   ScrollTrigger.defaults({
     // markers: true,
@@ -128,7 +123,6 @@ if (typeof window !== "undefined") {
 
   // Wird bei Astro-Page-Load / View-Transition gefeuert
   document.addEventListener("astro:page-load", () => {
-    console.log("astro:page-load → initPageAnimations");
     initPageAnimations();
   });
 

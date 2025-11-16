@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
 import Project from "../../components/Project.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
@@ -30,8 +31,31 @@ const { Content } = await project.render();
 ---
 
 <Layout title={`${project.data.title} – Simon Groiss`}>
+  <Header />
+
   <main class="bg-black text-white min-h-screen">
-    <section class="container mx-auto py-16 space-y-10">
+    <div
+      class="project-header h-[45vh] flex flex-col items-center justify-center"
+    >
+      <h1 class="text-6xl">{project.data.desc}</h1>
+    </div>
+
+    <div class="relative h-[100px]">
+      <div
+        id="project-entry-hero-title"
+        class="fixed h-full inset-0 flex items-center justify-center z-50 pointer-events-none"
+        style={`background-color: ${project.data.overlayColor};`}
+      >
+        <span class="text-lg uppercase">
+          {project.data.title}
+        </span>
+      </div>
+    </div>
+
+    <section
+      class="container content-con mx-auto py-16 space-y-10"
+      style="opacity: 0;"
+    >
       <!-- Back-Link -->
       <a
         href="/#projects"

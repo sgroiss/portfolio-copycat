@@ -15,8 +15,22 @@ import { ClientRouter } from "astro:transitions";
   </head>
   <body class="overflow-x-hidden bg-sg-primary/0 text-white antialiased">
     <slot />
+    <div
+      id="project-transition-overlay"
+      class="fixed z-40 pointer-events-none opacity-0"
+    >
+      <div
+        class="project-transition-overlay-bg w-full h-full flex items-center overflow-hidden"
+      >
+        <div class="project-transition-marquee w-full">
+          <div class="project-transition-marquee__inner text-6xl"></div>
+        </div>
+      </div>
+    </div>
     <script>
       import "../scripts/main.js";
+      import "../scripts/project-transition.js";
+      import "../scripts/project-entry.js";
     </script>
     <div id="res-helper"></div>
   </body>
