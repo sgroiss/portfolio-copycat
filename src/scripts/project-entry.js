@@ -1,78 +1,98 @@
-// return false;
-
+console.log("project-entry.js loaded");
 import gsap from "gsap";
 
-let entryAnimationStarted = false;
+let entryAnimation = document.getElementById("project-entry-animation");
+let entryStatic = document.getElementById("project-entry-static");
+let title = document.getElementById("project-title");
+let main = document.querySelector("main");
+let content = document.getElementById("project-content");
+let contentHeroImg = document.querySelector(".project-content-hero-img");
 
-// läuft nur sinnvoll auf Projekt-Detailseiten
-function setupProjectEntryAnimation() {
-  if (entryAnimationStarted) return;
-
-  const entryTitle = document.getElementById("project-entry-hero-title");
-  const main = document.querySelector("main");
-  const content = document.getElementsByClassName("content-con");
-
-  if (!entryTitle || !main) {
-    return;
-  }
-
-  entryAnimationStarted = true;
-
-  // Startzustände
-  const barHeight = 100;
-  const barTop = (window.innerHeight - barHeight) / 2;
-
-  const tl = gsap.timeline({
-    defaults: { ease: "power3.inOut" },
-  });
-
-  // 2. zum zentrierten Balken (mit Titel) werden
-  tl.to(entryTitle, {
-    height: barHeight,
-    top: barTop,
-    duration: 1.25,
-    onComplete() {
-      const rect = entryTitle.getBoundingClientRect();
-      const parentRect = entryTitle.parentElement.getBoundingClientRect();
-      const offsetTop = rect.top - parentRect.top;
-
-      entryTitle.classList.remove("fixed");
-      entryTitle.style.position = "absolute";
-      entryTitle.style.top = `${offsetTop}px`;
-    },
-  });
-
-  // 2. zum zentrierten Balken (mit Titel) werden
-  tl.to(content, {
-    opacity: 1,
-    duration: 0.5,
-  });
+let flag = sessionStorage.getItem("internalRef");
+if (flag == "1") {
+  sessionStorage.removeItem("internalRef");
+  doAnimation();
+} else {
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  doAnimation();
 }
 
-// Warten bis die Detailseite wirklich im DOM ist
-function waitForEntryTitleAndRun() {
-  const check = setInterval(() => {
-    if (entryAnimationStarted) {
-      clearInterval(check);
+function doAnimation() {
+  let entryAnimationStarted = false;
+
+  // läuft nur sinnvoll auf Projekt-Detailseiten
+  function setupProjectEntryAnimation() {
+    if (entryAnimationStarted) return;
+
+    if (!entryAnimation || !main) {
       return;
     }
+    entryAnimationStarted = true;
 
-    const entryTitle = document.getElementById("project-entry-hero-title");
-    const main = document.querySelector("main");
-    const overlay = document.getElementById("project-transition-overlay");
-    const overlayBg = overlay?.querySelector(".project-transition-overlay-bg");
+    // Startzustände
+    const staticRect = entryStatic.getBoundingClientRect();
+    const targetHeight = staticRect.height;
+    const targetTop = staticRect.top;
 
-    if (entryTitle && main && overlay && overlayBg) {
-      clearInterval(check);
-      setupProjectEntryAnimation();
-    }
-  }, 20);
+    let tl = gsap.timeline({
+      defaults: { ease: "power3.inOut" },
+    });
+
+    // 1. title einfaden
+    tl.to(title, {
+      opacity: 1,
+      duration: 0.25,
+    });
+
+    // 2. zum zentrierten Balken (mit Titel) werden
+    tl.to(entryAnimation, {
+      height: targetHeight,
+      top: targetTop,
+      duration: 0.65,
+      onComplete() {
+        let rect = entryAnimation.getBoundingClientRect();
+        let parentRect = entryAnimation.parentElement.getBoundingClientRect();
+        let offsetTop = rect.top - parentRect.top;
+
+        entryAnimation.classList.remove("fixed");
+        entryAnimation.style.position = "absolute";
+        entryAnimation.style.top = `${offsetTop}px`;
+      },
+    });
+
+    // 3. content einfaden
+    tl.to(content, {
+      opacity: 1,
+      duration: 0.5,
+    });
+  }
+
+  // Warten bis die Detailseite wirklich im DOM ist
+  function waitForEntryTitleAndRun() {
+    let check = setInterval(() => {
+      if (entryAnimationStarted) {
+        clearInterval(check);
+        return;
+      }
+
+      let entryAnimation = document.getElementById("project-entry-animation");
+      let main = document.querySelector("main");
+      let overlay = document.getElementById("project-transition-overlay");
+      let overlayBg = overlay?.querySelector(".project-transition-overlay-bg");
+
+      if (entryAnimation && main) {
+        clearInterval(check);
+        setupProjectEntryAnimation();
+      }
+    }, 20);
+  }
+
+  // Trigger bei Soft- und Hard-Navigation
+  document.addEventListener("astro:page-load", waitForEntryTitleAndRun);
+  document.addEventListener("astro:after-swap", waitForEntryTitleAndRun);
+  document.addEventListener("DOMContentLoaded", waitForEntryTitleAndRun);
+
+  // Falls der DOM schon fertig ist
+  waitForEntryTitleAndRun();
 }
-
-// Trigger bei Soft- und Hard-Navigation
-document.addEventListener("astro:page-load", waitForEntryTitleAndRun);
-document.addEventListener("astro:after-swap", waitForEntryTitleAndRun);
-document.addEventListener("DOMContentLoaded", waitForEntryTitleAndRun);
-
-// Falls der DOM schon fertig ist
-waitForEntryTitleAndRun();

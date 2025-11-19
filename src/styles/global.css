@@ -4,12 +4,17 @@
   /* Tailwind v4 Farbtokens */
   --color-sg-primary: #090f2b;
   --color-sg-secondary: #9fa2b3;
-  --color-sg-light-grey: #fafafa;
+  --color-sg-light-gray: #fafafa;
+  --color-sg-black: #090908;
+  --color-sg-light-black: #323230;
 }
 
 :root {
   --sg-primary: #090f2b;
   --sg-secondary: #9fa2b3;
+  --sg-light-gray: #fafafa;
+  --sg-black: #090908;
+  --sg-light-black: #323230;
   font-synthesis-weight: none;
   font-synthesis-style: none;
 
@@ -91,17 +96,6 @@
   }
 }
 
-/* Variable-Font Utilities (optional) */
-@utility wght-300 {
-  font-variation-settings: "wght" 300;
-}
-@utility wght-500 {
-  font-variation-settings: "wght" 500;
-}
-@utility wght-700 {
-  font-variation-settings: "wght" 700;
-}
-
 /* ===== Globale Styles ===== */
 @font-face {
   font-family: "DM Sans Variable";
@@ -110,12 +104,18 @@
   font-style: normal;
   font-display: swap;
 }
+.dm-sans {
+  font-family: "DM Sans Variable", sans-serif;
+}
 @font-face {
   font-family: "Geist Variable";
   src: url("/fonts/Geist/Geist-VariableFont_wght.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+}
+.geist-sans {
+  font-family: "Geist Variable", sans-serif;
 }
 
 body {
@@ -134,7 +134,6 @@ h1 {
 }
 h2 {
   font-family: "DM Sans Variable", sans-serif;
-  font-weight: 250;
 }
 
 p {
@@ -147,28 +146,6 @@ p:last-of-type {
 section {
   overflow: hidden;
   will-change: transform;
-}
-
-/* Project-Image Marquee ---------------------------------------- */
-.project-marquee {
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.project-marquee__inner {
-  display: inline-block;
-  padding-inline: 2rem;
-  animation: project-marquee 8s linear infinite;
-}
-
-/* Geschwindigkeit / Distanz kannst du später feinjustieren */
-@keyframes project-marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
 }
 
 /* RES HELPER -------------------------------------------- */

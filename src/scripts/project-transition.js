@@ -1,116 +1,52 @@
+console.log("project-transition.js loaded");
 import gsap from "gsap";
 
-function setupProjectExitAnimation() {
-  const links = document.querySelectorAll(".js-project-link");
-  if (!links.length) return;
+document.querySelectorAll(".work-item").forEach((card) => {
+  const link = card.querySelector("a"); // dein Detail-Link
+  const overlay = card.querySelector(".project-overlay"); // dein Farboverlay
+  const marquee = card.querySelector(".project-marquee");
 
-  const overlay = document.getElementById("project-transition-overlay");
-  if (!overlay) return;
+  if (!link || !overlay) return;
 
-  const overlayBg = overlay.querySelector(".project-transition-overlay-bg");
-  const overlayMarqueeInner = overlay.querySelector(
-    ".project-transition-marquee__inner",
-  );
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    const targetHref = link.getAttribute("href");
+    if (!targetHref) return;
 
-  if (!overlayBg || !overlayMarqueeInner) return;
+    const tl = gsap.timeline({
+      defaults: { ease: "power3.inOut" },
+      onComplete() {
+        sessionStorage.setItem("internalRef", "1");
+        window.location.href = targetHref;
+      },
+    });
 
-  links.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      // Nur Link-Clicks behandeln, keine Modifier (CMD/CTRL)
-      if (
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey ||
-        event.button !== 0
-      ) {
-        return;
-      }
+    tl.to(marquee, { opacity: 0, duration: 0.3 }, 0);
+    tl.to(overlay, { opacity: 1, duration: 0.3 }, 0);
 
-      event.preventDefault();
+    tl.add(() => {
+      const rect = overlay.getBoundingClientRect();
 
-      const href = link.getAttribute("href");
-      if (!href) return;
+      const fixedOverlay = overlay.cloneNode(true);
+      fixedOverlay.style.position = "fixed";
+      fixedOverlay.style.top = `${rect.top}px`;
+      fixedOverlay.style.left = `${rect.left}px`;
+      fixedOverlay.style.width = `${rect.width}px`;
+      fixedOverlay.style.height = `${rect.height}px`;
+      fixedOverlay.style.margin = "0";
+      fixedOverlay.style.pointerEvents = "none";
+      fixedOverlay.style.zIndex = 500;
+      document.body.appendChild(fixedOverlay);
 
-      const card = link.querySelector(".project-card");
-      const overlayColor = link.getAttribute("data-overlay-color") || "#000";
-      const projectTitle = link.getAttribute("data-project-title") || "";
+      overlay.style.visibility = "hidden";
 
-      if (!card) {
-        window.location.href = href;
-        return;
-      }
-
-      const rect = card.getBoundingClientRect();
-
-      // Overlay für Animation vorbereiten
-      overlay.style.display = "block";
-      overlay.style.position = "fixed";
-      overlay.style.top = `${rect.top}px`;
-      overlay.style.left = `${rect.left}px`;
-      overlay.style.width = `${rect.width}px`;
-      overlay.style.height = `${rect.height}px`;
-      overlay.style.pointerEvents = "none";
-
-      overlayBg.style.backgroundColor = overlayColor;
-      overlayMarqueeInner.textContent = `${projectTitle} — ${projectTitle} — ${projectTitle} — ${projectTitle}`;
-
-      // Body-Scroll optional sperren
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-
-      const tl = gsap.timeline({
-        onComplete() {
-          document.body.style.overflow = previousOverflow;
-          window.location.href = href;
-        },
+      tl.to(fixedOverlay, {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        duration: 0.7,
       });
-
-      // Startzustand
-      gsap.set(overlay, { opacity: 1 });
-      gsap.set(overlayBg, { opacity: 0.9 });
-      gsap.set(overlayMarqueeInner, { opacity: 1 });
-
-      // Marquee schnell ausblenden + Overlay voll deckend machen
-      tl.to(
-        overlayMarqueeInner,
-        {
-          opacity: 0,
-          duration: 0.2,
-          ease: "power2.out",
-        },
-        0,
-      );
-
-      tl.to(
-        overlayBg,
-        {
-          opacity: 1,
-          duration: 0.2,
-          ease: "power2.out",
-        },
-        0,
-      );
-
-      // Overlay von Card-Größe auf Fullscreen animieren
-      tl.to(
-        overlay,
-        {
-          top: 0,
-          left: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          duration: 0.6,
-          ease: "power3.inOut",
-        },
-        0,
-      );
     });
   });
-}
-
-// Für Astro View Transitions + ClientRouter:
-// Code immer nach einer Navigation neu laufen lassen.
-document.addEventListener("astro:page-load", () => {
-  setupProjectExitAnimation();
 });

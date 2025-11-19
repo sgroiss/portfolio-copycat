@@ -31,51 +31,109 @@ const { Content } = await project.render();
 ---
 
 <Layout title={`${project.data.title} – Simon Groiss`}>
-  <Header />
-
-  <main class="bg-black text-white min-h-screen">
+  <main class="min-h-screen">
     <div
-      class="project-header h-[45vh] flex flex-col items-center justify-center"
+      id="project-header"
+      class="md:h-[30vh] lg:h-[45vh] flex flex-col items-center justify-center"
     >
       <h1 class="text-6xl">{project.data.desc}</h1>
     </div>
 
-    <div class="relative h-[100px]">
+    <div id="project-entry-container" class="relative h-[100px]">
       <div
-        id="project-entry-hero-title"
+        id="project-entry-static"
+        class="h-[100px] flex items-center justify-center"
+        style={`background-color: ${project.data.overlayColor};`}
+      >
+        <span class="text-lg uppercase"> {project.data.title}</span>
+      </div>
+      <div
+        id="project-entry-animation"
         class="fixed h-full inset-0 flex items-center justify-center z-50 pointer-events-none"
         style={`background-color: ${project.data.overlayColor};`}
       >
-        <span class="text-lg uppercase">
+        <span id="project-title" class="text-lg uppercase opacity-0">
           {project.data.title}
         </span>
       </div>
     </div>
 
-    <section
-      class="container content-con mx-auto py-16 space-y-10"
-      style="opacity: 0;"
-    >
-      <!-- Back-Link -->
-      <a
-        href="/#projects"
-        class="inline-flex items-center text-sm text-gray-400 hover:text-white hover:underline"
-      >
-        ← Back to projects
-      </a>
-
-      <!-- Hero / Projekt-Teaser -->
-      <Project
-        id={project.slug}
-        title={project.data.title}
-        desc={project.data.desc}
-        img={project.data.img}
+    <section id="project-content" style="opacity: 0;">
+      <img
+        src={project.data.img}
+        alt={project.data.imgAlt}
+        class="project-content-hero-img max-h-[75vh] w-full object-cover object-center"
       />
 
       <!-- Langer Case-Text aus dem Markdown-Body -->
-      <article class="max-w-3xl space-y-4 leading-relaxed text-gray-200">
-        <Content />
+      <article
+        class="w-full py-32"
+        style={`color: ${project.data.contentTextColor}; background-color: ${project.data.contentColor};`}
+      >
+        <div class="container">
+          <div class="px-[20vw]!">
+            <h2 class="text-4xl dm-sans font-[400] mb-2">
+              Client headline – blah blah about the client
+            </h2>
+            <p class="text-lg">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam
+              adipisci, optio rerum nobis eos recusandae vel perferendis laborum
+              unde incidunt commodi nostrum quis fuga laboriosam vero veniam
+              voluptatem saepe repudiandae?
+            </p>
+          </div>
+
+          <div class="spacer py-16"></div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <img
+              class="w-full max-h-[65vh] object-cover"
+              src="../../../images/placeholder/v-brooke-balentine-FkIIu9DDZVo-unsplash.jpg"
+              alt=""
+            />
+            <img
+              class="w-full max-h-[65vh] object-cover"
+              src="../../../images/placeholder/v-sebastien-lavalaye-fnXQb_bN6F4-unsplash.jpg"
+              alt=""
+            />
+          </div>
+
+          <div class="spacer py-16"></div>
+
+          <div class="px-[20vw]!">
+            <h2 class="text-4xl dm-sans font-[400] mb-2">
+              Project headline – blah blah about the project
+            </h2>
+            <p class="text-lg">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam
+              adipisci, optio rerum nobis eos recusandae vel perferendis laborum
+              unde incidunt commodi nostrum quis fuga laboriosam vero veniam
+              voluptatem saepe repudiandae?
+            </p>
+          </div>
+
+          <div class="spacer py-16"></div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div></div>
+            <img
+              class="w-full max-h-[65vh] object-cover"
+              src="../../../images/placeholder/foo-2.jpg"
+              alt=""
+            />
+          </div>
+        </div>
       </article>
     </section>
   </main>
+  <div
+    class="py-32 bg-sg-light-black hover:bg-red-400 flex items-center justify-center transition-colors duration-300"
+  >
+    next/prev project - siehe basili.co
+  </div>
 </Layout>
+
+<script>
+  import "../../scripts/main.js";
+  import "../../scripts/project-entry.js";
+</script>

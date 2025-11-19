@@ -1,7 +1,8 @@
 ---
 title: "Motion Experiments"
 desc: "Variable Typography & generative Motion Design."
-img: "/images/placeholder/v-1.jpg"
+img: "/images/placeholder/foo-1.jpg"
+imgAlt: "ALT TEXT"
 year: 2023
 client: "Self-initiated"
 role:
@@ -9,7 +10,9 @@ role:
   - "Motion Design"
 featured: true
 order: 2
-overlayColor: "#959595" # Beispiel – frei wählbar
+overlayColor: "#ef8687"
+contentColor: "#090908"
+contentTextColor: "#fafafa"
 ---
 
 Kurze Beschreibung, später evtl. ausbauen.

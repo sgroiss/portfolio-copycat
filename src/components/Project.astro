@@ -7,13 +7,18 @@ const {
   imgAlt = title,
   overlayColor = null,
 } = Astro.props;
-const marqueeText = `${title} — ${title} — ${title} — ${title} — ${title} — ${title}`;
+
+// wie in Marquee.astro: viele Wiederholungen, damit genug Breite da ist
+const EM_SPACE = "\u2002";
+const repeated = Array.from({ length: 10 })
+  .map(() => title)
+  .join(EM_SPACE);
 ---
 
 <article
   itemscope
   itemtype="https://schema.org/CreativeWork"
-  class="project-card"
+  class="project-card group"
 >
   {
     img && (
@@ -22,11 +27,17 @@ const marqueeText = `${title} — ${title} — ${title} — ${title} — ${title
 
         {overlayColor && (
           <div
-            class="project-overlay absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center overflow-hidden"
+            class="project-overlay absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-400 flex items-center overflow-hidden"
             style={`background-color: ${overlayColor}`}
           >
-            <div class="project-marquee w-full">
-              <div class="project-marquee__inner text-6xl">{marqueeText}</div>
+            <div class="project-marquee w-full overflow-hidden whitespace-nowrap">
+              <div
+                class="project-marquee__inner inline-flex w-max text-6xl leading-none"
+                aria-hidden="true"
+              >
+                <span class="py-2">{repeated}</span>
+                <span class="py-2">{repeated}</span>
+              </div>
             </div>
           </div>
         )}
@@ -46,3 +57,23 @@ const marqueeText = `${title} — ${title} — ${title} — ${title} — ${title
     {desc}
   </p>
 </article>
+
+<style>
+  .project-marquee {
+    /* overflow + whitespace sind hier schon gesetzt,
+       Tailwind-Classes bleiben aber auch okay */
+  }
+
+  .project-marquee__inner {
+    animation: project-marquee 40s linear infinite;
+  }
+
+  @keyframes project-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

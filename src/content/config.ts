@@ -6,12 +6,15 @@ const projects = defineCollection({
     title: z.string(),
     desc: z.string(),
     img: z.string().optional(),
+    imgAlt: z.string().optional(),
     year: z.number().optional(),
     client: z.string().optional(),
     role: z.array(z.string()).optional(),
     featured: z.boolean().optional().default(true),
     order: z.number().optional(),
     overlayColor: z.string().optional(),
+    contentColor: z.string().optional(),
+    contentTextColor: z.string().optional(),
   }),
 });
 

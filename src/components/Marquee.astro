@@ -1,0 +1,38 @@
+---
+interface Props {
+  label: string;
+  direction?: "left" | "right";
+}
+
+const EM_SPACE = "\u2002"; // breites Leerzeichen
+const { label, direction = "left" } = Astro.props;
+const repeated = Array.from({ length: 10 })
+  .map(() => label)
+  .join(EM_SPACE);
+---
+
+<div class={`overflow-hidden whitespace-nowrap ${direction}`}>
+  <div class="inner inline-flex w-max dm-sans font-[600]">
+    <span class="pr-8 py-1 text-[6rem] leading-none">{repeated}</span>
+    <span class="pr-8 py-1 text-[6rem] leading-none">{repeated}</span>
+  </div>
+</div>
+
+<style>
+  .inner {
+    animation: marquee 50s linear infinite;
+  }
+
+  .right .inner {
+    animation-direction: reverse;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

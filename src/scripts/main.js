@@ -75,6 +75,60 @@ function initScrollSpeed() {
   });
 }
 
+// Header ein/ausfaden
+function initHeader() {
+  const header = document.querySelector("#site-header");
+  const velocityThreshold = 200;
+  ScrollTrigger.create({
+    start: 0,
+    end: "max",
+    onUpdate(self) {
+      const dir = self.direction; // 1 = nach unten, -1 = nach oben
+      const velocity = Math.abs(self.getVelocity());
+
+      // Nach unten scrollen → Header ausblenden (bei genügend Geschwindigkeit)
+      if (dir === 1 && velocity > velocityThreshold) {
+        header.classList.replace("translate-y-0", "-translate-y-full");
+      }
+
+      // Nach oben scrollen → Header immer einblenden
+      if (dir === -1) {
+        header.classList.replace("-translate-y-full", "translate-y-0");
+      }
+
+      // Ganz oben → Header sicher sichtbar
+      if (self.progress === 0) {
+        header.classList.replace("-translate-y-full", "translate-y-0");
+      }
+    },
+  });
+}
+
+// Footer Marquee Link Hover Effekts --------------------------------------
+// alle Marquee-Links holen
+function initFooterMarqueeLinks() {
+  const marqueeLinks = document.querySelectorAll(".footer-marquee-link");
+
+  // für jedes Element Enter/Leave registrieren
+  marqueeLinks.forEach((link) => {
+    link.addEventListener("mouseenter", () => {
+      gsap.to(link, {
+        color: "#fafafa",
+        duration: 0.3,
+        ease: "sine.out",
+      });
+    });
+
+    link.addEventListener("mouseleave", () => {
+      gsap.to(link, {
+        color: "#323230",
+        duration: 0.55,
+        ease: "sine.inOut",
+      });
+    });
+  });
+}
+
 function initAnchorScroll() {
   if (!lenis) return;
 
@@ -93,9 +147,28 @@ function initAnchorScroll() {
       event.preventDefault();
 
       lenis.scrollTo(target, {
-        duration: 1.2,
-        offset: -80,
+        duration: 1,
+        // offset: -80,
       });
+    });
+  });
+}
+
+function initDimSections() {
+  document.querySelectorAll("section[data-dim]").forEach((section) => {
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top 100%",
+      end: "bottom 0%",
+      scrub: true,
+      // markers: true,
+      onUpdate: (self) => {
+        // Wert 0–1 schreiben
+        let val = self.progress.toFixed(4) * -1 + 1.5;
+        let val2 = val + 0.5;
+        let val3 = val2 - self.progress.toFixed(4);
+        section.style.setProperty("--dim", val3);
+      },
     });
   });
 }
@@ -109,7 +182,10 @@ function initPageAnimations() {
 
   initOverlapSections();
   initScrollSpeed();
+  initDimSections(); // <---- HINZUFÜGEN
   initAnchorScroll();
+  initHeader();
+  initFooterMarqueeLinks();
 
   ScrollTrigger.refresh();
 }

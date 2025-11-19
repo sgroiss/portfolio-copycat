@@ -13,6 +13,9 @@
         "img": {
           "type": "string"
         },
+        "imgAlt": {
+          "type": "string"
+        },
         "year": {
           "type": "number"
         },
@@ -33,6 +36,12 @@
           "type": "number"
         },
         "overlayColor": {
+          "type": "string"
+        },
+        "contentColor": {
+          "type": "string"
+        },
+        "contentTextColor": {
           "type": "string"
         },
         "$schema": {
