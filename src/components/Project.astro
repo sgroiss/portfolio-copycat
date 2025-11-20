@@ -26,17 +26,22 @@ const repeated = Array.from({ length: 10 })
         <img src={img} alt={imgAlt} itemprop="image" class="block w-full" />
 
         {overlayColor && (
-          <div
-            class="project-overlay absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-400 flex items-center overflow-hidden"
-            style={`background-color: ${overlayColor}`}
-          >
-            <div class="project-marquee w-full overflow-hidden whitespace-nowrap">
+          <div class="project-overlay absolute inset-0 flex items-center overflow-hidden">
+            {/* Hintergrund-Layer mit 0 → 90% Opacity */}
+            <div
+              class="absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity duration-400"
+              style={`background-color: ${overlayColor}`}
+              aria-hidden="true"
+            />
+
+            {/* Text-Layer mit eigener Opacity-Animation */}
+            <div class="project-marquee relative w-full overflow-hidden whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-400">
               <div
                 class="project-marquee__inner inline-flex w-max text-6xl leading-none"
                 aria-hidden="true"
               >
-                <span class="py-2">{repeated}</span>
-                <span class="py-2">{repeated}</span>
+                <span class="py-2 font-white">{repeated}</span>
+                <span class="py-2 font-white">{repeated}</span>
               </div>
             </div>
           </div>
@@ -59,11 +64,6 @@ const repeated = Array.from({ length: 10 })
 </article>
 
 <style>
-  .project-marquee {
-    /* overflow + whitespace sind hier schon gesetzt,
-       Tailwind-Classes bleiben aber auch okay */
-  }
-
   .project-marquee__inner {
     animation: project-marquee 40s linear infinite;
   }

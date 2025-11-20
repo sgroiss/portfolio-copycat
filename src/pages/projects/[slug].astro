@@ -1,27 +1,40 @@
 ---
+/// src/pages/projects/[slug].astro
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
 import Project from "../../components/Project.astro";
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
+import MediaRenderer from "../../components/MediaRenderer.astro";
 
 type ProjectEntry = CollectionEntry<"projects">;
 
 // 1. Alle statischen Pfade für /projects/[slug] erzeugen
 export async function getStaticPaths() {
-  const projects = await getCollection("projects");
+  const projects = await getCollection<"projects">("projects");
   return projects.map((project) => ({
     params: { slug: project.slug },
   }));
 }
 
 // 2. Aktuellen Eintrag anhand des Slugs holen
+const allProjects = await getCollection<"projects">("projects");
 const { slug } = Astro.params;
 
-const allProjects = await getCollection("projects");
-const project = allProjects.find((p) => p.slug === slug) as
-  | ProjectEntry
-  | undefined;
+// Projekte so sortieren wie auf der Startseite (nach "order")
+const projects = allProjects
+  .filter((entry) => entry.data.featured !== false)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+
+const projectIndex = projects.findIndex((p) => p.slug === slug);
+
+if (projectIndex === -1) {
+  throw new Error(`Project not found for slug: ${slug}`);
+}
+
+const project = projects[projectIndex] as ProjectEntry;
+
+// Nächstes Projekt im Loop berechnen
+const nextIndex = (projectIndex + 1) % projects.length;
+const nextProject = projects[nextIndex];
 
 if (!project) {
   throw new Error(`Project not found for slug: ${slug}`);
@@ -32,6 +45,7 @@ const { Content } = await project.render();
 
 <Layout title={`${project.data.title} – Simon Groiss`}>
   <main class="min-h-screen">
+    <!-- Header / Intro -->
     <div
       id="project-header"
       class="md:h-[30vh] lg:h-[45vh] flex flex-col items-center justify-center"
@@ -39,13 +53,14 @@ const { Content } = await project.render();
       <h1 class="text-6xl">{project.data.desc}</h1>
     </div>
 
+    <!-- dein Entry-Overlay, unverändert -->
     <div id="project-entry-container" class="relative h-[100px]">
       <div
         id="project-entry-static"
         class="h-[100px] flex items-center justify-center"
         style={`background-color: ${project.data.overlayColor};`}
       >
-        <span class="text-lg uppercase"> {project.data.title}</span>
+        <span class="text-lg uppercase">{project.data.title}</span>
       </div>
       <div
         id="project-entry-animation"
@@ -58,79 +73,105 @@ const { Content } = await project.render();
       </div>
     </div>
 
-    <section id="project-content" style="opacity: 0;">
-      <img
-        src={project.data.img}
-        alt={project.data.imgAlt}
-        class="project-content-hero-img max-h-[75vh] w-full object-cover object-center"
-      />
+    <!-- CONTENT aus sections[] -->
+    <section id="project-content">
+      {
+        project.data.sections?.map((section, index) => {
+          // MEDIENBLOCK (ein Bild/Video)
+          if (section.type === "media") {
+            const baseClasses = section.fullwidth
+              ? "w-full"
+              : (section.class ?? "container mx-auto ");
 
-      <!-- Langer Case-Text aus dem Markdown-Body -->
-      <article
-        class="w-full py-32"
-        style={`color: ${project.data.contentTextColor}; background-color: ${project.data.contentColor};`}
-      >
-        <div class="container">
-          <div class="px-[20vw]!">
-            <h2 class="text-4xl dm-sans font-[400] mb-2">
-              Client headline – blah blah about the client
-            </h2>
-            <p class="text-lg">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam
-              adipisci, optio rerum nobis eos recusandae vel perferendis laborum
-              unde incidunt commodi nostrum quis fuga laboriosam vero veniam
-              voluptatem saepe repudiandae?
-            </p>
-          </div>
+            return (
+              <div class={baseClasses} data-section-index={index}>
+                <MediaRenderer
+                  media={{
+                    type: section.format,
+                    src: section.src,
+                    alt: section.alt,
+                    poster: section.poster,
+                  }}
+                  fallbackAlt={project.data.title}
+                  class="w-full object-cover"
+                />
+              </div>
+            );
+          }
 
-          <div class="spacer py-16"></div>
+          // MEDIA-GROUP (z.B. 2 Bilder im Grid)
+          if (section.type === "media-group") {
+            const cols =
+              section.layout === "3col" ? "grid-cols-3" : "grid-cols-2";
+            const gap = section.gap ?? "gap-4";
 
-          <div class="grid grid-cols-2 gap-4">
-            <img
-              class="w-full max-h-[65vh] object-cover"
-              src="../../../images/placeholder/v-brooke-balentine-FkIIu9DDZVo-unsplash.jpg"
-              alt=""
-            />
-            <img
-              class="w-full max-h-[65vh] object-cover"
-              src="../../../images/placeholder/v-sebastien-lavalaye-fnXQb_bN6F4-unsplash.jpg"
-              alt=""
-            />
-          </div>
+            return (
+              <div
+                class={`container mx-auto grid ${cols} ${gap}`}
+                data-section-index={index}
+              >
+                {section.items.map((item, itemIndex) => (
+                  <MediaRenderer
+                    media={{
+                      type: item.format,
+                      src: item.src,
+                      alt: item.alt,
+                      poster: item.poster,
+                    }}
+                    fallbackAlt={project.data.title}
+                    class={item.class ?? "w-full object-cover"}
+                    data-item-index={itemIndex}
+                  />
+                ))}
+              </div>
+            );
+          }
 
-          <div class="spacer py-16"></div>
+          // TEXTBLOCK
+          if (section.type === "text") {
+            return (
+              <div
+                class="container mx-auto px-[20vw]!"
+                data-section-index={index}
+              >
+                <h2 class="text-4xl dm-sans font-normal mb-2">
+                  {section.title}
+                </h2>
+                <p class="text-lg">{section.body}</p>
+              </div>
+            );
+          }
 
-          <div class="px-[20vw]!">
-            <h2 class="text-4xl dm-sans font-[400] mb-2">
-              Project headline – blah blah about the project
-            </h2>
-            <p class="text-lg">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Totam
-              adipisci, optio rerum nobis eos recusandae vel perferendis laborum
-              unde incidunt commodi nostrum quis fuga laboriosam vero veniam
-              voluptatem saepe repudiandae?
-            </p>
-          </div>
+          // SPACER
+          if (section.type === "spacer") {
+            const pad = section.size ?? "py-20";
+            return <div class={pad} data-section-index={index} />;
+          }
 
-          <div class="spacer py-16"></div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div></div>
-            <img
-              class="w-full max-h-[65vh] object-cover"
-              src="../../../images/placeholder/foo-2.jpg"
-              alt=""
-            />
-          </div>
-        </div>
-      </article>
+          return null;
+        })
+      }
     </section>
   </main>
-  <div
-    class="py-32 bg-sg-light-black hover:bg-red-400 flex items-center justify-center transition-colors duration-300"
-  >
-    next/prev project - siehe basili.co
-  </div>
+
+  {
+    nextProject && (
+      <a
+        href={`/projects/${nextProject.slug}`}
+        class="block"
+        onclick="sessionStorage.setItem('internalRef','1')"
+      >
+        <div
+          class="py-32 bg-sg-light-black flex items-center justify-center transition-colors duration-300 next-project-teaser"
+          style={`--next-overlay-color: ${nextProject.data.overlayColor ?? "#ff0000"}`}
+        >
+          <span class="uppercase tracking-wide text-lg">
+            Zum nächsten Projekt:&nbsp;{nextProject.data.title}
+          </span>
+        </div>
+      </a>
+    )
+  }
 </Layout>
 
 <script>

@@ -1,59 +1,63 @@
 console.log("project-entry.js loaded");
 import gsap from "gsap";
 
-let entryAnimation = document.getElementById("project-entry-animation");
-let entryStatic = document.getElementById("project-entry-static");
-let title = document.getElementById("project-title");
-let main = document.querySelector("main");
-let content = document.getElementById("project-content");
-let contentHeroImg = document.querySelector(".project-content-hero-img");
+/**
+ * Animation für die aktuelle Projekt-Detailseite starten
+ */
+function runProjectEntryAnimation() {
+  const entryAnimation = document.getElementById("project-entry-animation");
+  const entryStatic = document.getElementById("project-entry-static");
+  const title = document.getElementById("project-title");
+  const content = document.getElementById("project-content");
+  const main = document.querySelector("main");
 
-let flag = sessionStorage.getItem("internalRef");
-if (flag == "1") {
-  sessionStorage.removeItem("internalRef");
-  doAnimation();
-} else {
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  doAnimation();
-}
+  // Wenn wir nicht auf einer Projektseite sind, abbrechen
+  if (!entryAnimation || !entryStatic || !title || !content || !main) {
+    return;
+  }
 
-function doAnimation() {
-  let entryAnimationStarted = false;
+  // Pro Seite nur einmal animieren
+  if (entryAnimation.dataset.initialized === "1") {
+    return;
+  }
+  entryAnimation.dataset.initialized = "1";
 
-  // läuft nur sinnvoll auf Projekt-Detailseiten
-  function setupProjectEntryAnimation() {
-    if (entryAnimationStarted) return;
+  const flag = sessionStorage.getItem("internalRef");
+  if (flag === "1") {
+    sessionStorage.removeItem("internalRef");
+  }
 
-    if (!entryAnimation || !main) {
-      return;
-    }
-    entryAnimationStarted = true;
-
-    // Startzustände
+  // --- NEU: Funktion, die die eigentliche GSAP-Animation startet ---
+  function startAnimation() {
     const staticRect = entryStatic.getBoundingClientRect();
     const targetHeight = staticRect.height;
     const targetTop = staticRect.top;
 
-    let tl = gsap.timeline({
+    // Startzustände
+    gsap.set(content, { opacity: 0 });
+    gsap.set(title, { opacity: 0 });
+
+    const tl = gsap.timeline({
       defaults: { ease: "power3.inOut" },
     });
 
-    // 1. title einfaden
+    console.log("Project entry animation run");
+
+    // 1. Titel einfaden
     tl.to(title, {
       opacity: 1,
       duration: 0.25,
     });
 
-    // 2. zum zentrierten Balken (mit Titel) werden
+    // 2. Balken von full/fixed in die Statik überführen
     tl.to(entryAnimation, {
       height: targetHeight,
       top: targetTop,
       duration: 0.65,
       onComplete() {
-        let rect = entryAnimation.getBoundingClientRect();
-        let parentRect = entryAnimation.parentElement.getBoundingClientRect();
-        let offsetTop = rect.top - parentRect.top;
+        const rect = entryAnimation.getBoundingClientRect();
+        const parentRect = entryAnimation.parentElement.getBoundingClientRect();
+        const offsetTop = rect.top - parentRect.top;
 
         entryAnimation.classList.remove("fixed");
         entryAnimation.style.position = "absolute";
@@ -61,38 +65,42 @@ function doAnimation() {
       },
     });
 
-    // 3. content einfaden
+    // 3. Content einfaden
     tl.to(content, {
       opacity: 1,
       duration: 0.5,
     });
   }
 
-  // Warten bis die Detailseite wirklich im DOM ist
-  function waitForEntryTitleAndRun() {
-    let check = setInterval(() => {
-      if (entryAnimationStarted) {
-        clearInterval(check);
-        return;
-      }
-
-      let entryAnimation = document.getElementById("project-entry-animation");
-      let main = document.querySelector("main");
-      let overlay = document.getElementById("project-transition-overlay");
-      let overlayBg = overlay?.querySelector(".project-transition-overlay-bg");
-
-      if (entryAnimation && main) {
-        clearInterval(check);
-        setupProjectEntryAnimation();
-      }
-    }, 20);
+  // --- NEU: Lenis-aware scrollToTop ---
+  if (
+    typeof window !== "undefined" &&
+    window.lenis &&
+    typeof window.lenis.scrollTo === "function"
+  ) {
+    // Scroll-Position sofort (ohne Ease) auf 0 setzen
+    window.lenis.scrollTo(0, { immediate: true });
+  } else {
+    // Fallback, falls Lenis nicht verfügbar ist
+    window.scrollTo({ top: 0, behavior: "auto" });
   }
 
-  // Trigger bei Soft- und Hard-Navigation
-  document.addEventListener("astro:page-load", waitForEntryTitleAndRun);
-  document.addEventListener("astro:after-swap", waitForEntryTitleAndRun);
-  document.addEventListener("DOMContentLoaded", waitForEntryTitleAndRun);
-
-  // Falls der DOM schon fertig ist
-  waitForEntryTitleAndRun();
+  // WICHTIG: Erst im nächsten Frame messen, wenn das Scrollen wirklich "angekommen" ist
+  requestAnimationFrame(startAnimation);
 }
+
+/**
+ * Callback, der nach einem Astro-Navigationsevent die Animation triggert
+ */
+function handleAstroNavigation() {
+  // kleiner Timeout, damit der neue DOM sicher steht
+  setTimeout(runProjectEntryAnimation, 0);
+}
+
+// Events von Astro + klassisches DOMContentLoaded
+document.addEventListener("astro:page-load", handleAstroNavigation);
+document.addEventListener("astro:after-swap", handleAstroNavigation);
+document.addEventListener("DOMContentLoaded", handleAstroNavigation);
+
+// Falls der DOM schon fertig ist (direkter Reload etc.)
+handleAstroNavigation();

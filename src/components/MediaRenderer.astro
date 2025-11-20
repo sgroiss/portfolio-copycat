@@ -1,0 +1,77 @@
+---
+interface Props {
+  media?: {
+    type?: "image" | "video";
+    src: string;
+    alt?: string;
+    sizes?: string; // Optional: Override für spezielle Layouts
+  };
+  fallbackAlt?: string;
+  class?: string;
+}
+
+const { media, fallbackAlt, class: mediaClass } = Astro.props;
+
+if (!media) return null;
+
+const altText = media.alt || fallbackAlt || "";
+
+// Extension & Basename
+const ext = media.src.substring(media.src.lastIndexOf(".")).toLowerCase();
+const base = media.src.substring(0, media.src.lastIndexOf("."));
+
+// Varianten, die dein Image-Watcher baut
+const variants = [
+  { suffix: "", d: "1x" },
+  { suffix: "@0.75x", d: "0.75x" },
+  { suffix: "@0.5x", d: "0.5x" },
+  { suffix: "@0.25x", d: "0.25x" },
+];
+
+// AVIF srcset
+const avifSrcSet = variants
+  .map((v) => `${base}${v.suffix}.avif ${v.d}`)
+  .join(", ");
+
+// JPEG/PNG srcset
+const rasterSrcSet = variants
+  .map((v) => `${base}${v.suffix}${ext} ${v.d}`)
+  .join(", ");
+
+// Default sizes für dein Layout (kann überschrieben werden)
+const defaultSizes = `
+  (max-width: 640px) 100vw,
+  (max-width: 1024px) 90vw,
+  1200px
+`;
+
+const sizes = media.sizes || defaultSizes;
+---
+
+{
+  media.type === "video" ? (
+    <video src={media.src} class={mediaClass} muted autoplay playsinline />
+  ) : (
+    <picture>
+      {/* Modernes Format zuerst */}
+      <source type="image/avif" srcset={avifSrcSet} sizes={sizes} />
+
+      {/* Fallback: PNG/JPG */}
+      <source
+        type={ext === ".png" ? "image/png" : "image/jpeg"}
+        srcset={rasterSrcSet}
+        sizes={sizes}
+      />
+
+      {/* Fallback <img> */}
+      <img
+        src={media.src}
+        alt={altText}
+        class={mediaClass}
+        loading="lazy"
+        decoding="async"
+        sizes={sizes}
+      />
+    </picture>
+  )
+}

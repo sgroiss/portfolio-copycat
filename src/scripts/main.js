@@ -11,6 +11,7 @@ function setupLenis() {
   if (lenisInitialized || typeof window === "undefined") return;
 
   lenis = new Lenis({ duration: 1.2, smooth: true });
+  window.lenis = lenis;
 
   function raf(time) {
     lenis.raf(time);
@@ -182,7 +183,7 @@ function initPageAnimations() {
 
   initOverlapSections();
   initScrollSpeed();
-  initDimSections(); // <---- HINZUFÜGEN
+  initDimSections();
   initAnchorScroll();
   initHeader();
   initFooterMarqueeLinks();
