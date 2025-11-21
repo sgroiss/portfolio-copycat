@@ -11,8 +11,39 @@ const projects = allProjects
   .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
 ---
 
+<style>
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--space-l);
+  }
+
+  .work-item {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 768px) {
+    .work-item {
+      grid-column: span 6;
+    }
+  }
+
+  .work-item--wide {
+    grid-column: 1 / -1;
+  }
+
+  .work-item--wide-left {
+    grid-column: 1 / span 10;
+  }
+
+  .work-item--wide-right {
+    grid-column: 3 / span 10;
+  }
+</style>
+
 <Layout title="Simon Groiss">
-  <main class="flex-1">
+  <main class="static">
     <Hero />
 
     <section

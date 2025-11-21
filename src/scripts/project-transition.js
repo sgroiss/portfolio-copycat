@@ -3,7 +3,8 @@ import gsap from "gsap";
 
 document.querySelectorAll(".work-item").forEach((card) => {
   const link = card.querySelector("a"); // dein Detail-Link
-  const overlay = card.querySelector(".project-overlay"); // dein Farboverlay
+  // NEU: Nur den Hintergrund-Layer als Overlay benutzen
+  const overlay = card.querySelector(".project-overlay-bg");
   const marquee = card.querySelector(".project-marquee");
 
   if (!link || !overlay) return;
@@ -21,7 +22,12 @@ document.querySelectorAll(".work-item").forEach((card) => {
       },
     });
 
-    tl.to(marquee, { opacity: 0, duration: 0.3 }, 0);
+    // Text ausblenden
+    if (marquee) {
+      tl.to(marquee, { opacity: 0, duration: 0.3 }, 0);
+    }
+
+    // Farbfläche einblenden
     tl.to(overlay, { opacity: 1, duration: 0.3 }, 0);
 
     tl.add(() => {
@@ -38,6 +44,7 @@ document.querySelectorAll(".work-item").forEach((card) => {
       fixedOverlay.style.zIndex = 500;
       document.body.appendChild(fixedOverlay);
 
+      // Original-BG unsichtbar machen
       overlay.style.visibility = "hidden";
 
       tl.to(fixedOverlay, {

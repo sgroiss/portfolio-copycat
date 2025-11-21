@@ -1,5 +1,93 @@
+// src/scripts/project-entry.js
 console.log("project-entry.js loaded");
 import gsap from "gsap";
+
+function runProjectExitReverse(direction = "next") {
+  const exitOverlay = document.getElementById("project-exit-overlay");
+  const content = document.getElementById("project-content");
+  const title = document.getElementById("project-title");
+
+  if (!exitOverlay || !content || !title) return;
+
+  // Farbe aus sessionStorage → Fallback: data-Attribut / aktuelles BG
+  const storedColor = sessionStorage.getItem("projectExitColor");
+  const fallbackColor =
+    exitOverlay.dataset.projectOverlayColor ||
+    window.getComputedStyle(exitOverlay).backgroundColor ||
+    "#000";
+  const color = (storedColor || fallbackColor).trim();
+
+  // nach Verwendung direkt wieder löschen
+  sessionStorage.removeItem("projectExitColor");
+
+  // ursprüngliches Entry-Overlay entfernen, damit es nichts überdeckt
+  const entryOverlay = document.getElementById("project-entry-animation");
+  if (entryOverlay && entryOverlay.parentElement) {
+    entryOverlay.parentElement.removeChild(entryOverlay);
+  }
+
+  // Scroll nach oben (Lenis-aware), damit der neue Screen "oben" startet
+  if (
+    typeof window !== "undefined" &&
+    window.lenis &&
+    typeof window.lenis.scrollTo === "function"
+  ) {
+    window.lenis.scrollTo(0, { immediate: true });
+  } else {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  // Startzustände für Reverse-Overlay + Content
+  if (direction === "next") {
+    // wir "gehen nach rechts" → Overlay hängt rechts, schrumpft von 100 → 0
+    gsap.set(exitOverlay, {
+      width: "100vw",
+      left: "auto",
+      right: 0,
+      backgroundColor: color,
+    });
+  } else {
+    // "prev" → wir "gehen nach links" → Overlay hängt links, schrumpft von 100 → 0
+    gsap.set(exitOverlay, {
+      width: "100vw",
+      left: 0,
+      right: "auto",
+      backgroundColor: color,
+    });
+  }
+
+  gsap.set(content, { opacity: 0 });
+  gsap.set(title, { opacity: 0 });
+
+  const tl = gsap.timeline({
+    defaults: { ease: "power3.inOut" },
+  });
+
+  // 1) Overlay von der jeweiligen Seite "rausziehen" (100% → 0%)
+  tl.to(exitOverlay, {
+    width: 0,
+    duration: 0.7,
+  });
+
+  // 2) Content + Titel einblenden
+  tl.to(
+    content,
+    {
+      opacity: 1,
+      duration: 0.5,
+    },
+    "-=0.3",
+  );
+
+  tl.to(
+    title,
+    {
+      opacity: 1,
+      duration: 0.5,
+    },
+    "-=0.5",
+  );
+}
 
 /**
  * Animation für die aktuelle Projekt-Detailseite starten
@@ -27,7 +115,15 @@ function runProjectEntryAnimation() {
     sessionStorage.removeItem("internalRef");
   }
 
-  // --- NEU: Funktion, die die eigentliche GSAP-Animation startet ---
+  // Kommen wir von einer anderen Projektseite?
+  const fromProject = sessionStorage.getItem("fromProject"); // "next" | "prev" | null
+  if (fromProject === "next" || fromProject === "prev") {
+    sessionStorage.removeItem("fromProject");
+    runProjectExitReverse(fromProject);
+    return; // wichtige: normale Entry-Animation NICHT mehr laufen lassen
+  }
+
+  // --- normale Entry-Animation (von Home etc.) ---
   function startAnimation() {
     const staticRect = entryStatic.getBoundingClientRect();
     const targetHeight = staticRect.height;
@@ -72,16 +168,14 @@ function runProjectEntryAnimation() {
     });
   }
 
-  // --- NEU: Lenis-aware scrollToTop ---
+  // --- Lenis-aware scrollToTop für normalen Entry ---
   if (
     typeof window !== "undefined" &&
     window.lenis &&
     typeof window.lenis.scrollTo === "function"
   ) {
-    // Scroll-Position sofort (ohne Ease) auf 0 setzen
     window.lenis.scrollTo(0, { immediate: true });
   } else {
-    // Fallback, falls Lenis nicht verfügbar ist
     window.scrollTo({ top: 0, behavior: "auto" });
   }
 
@@ -100,6 +194,14 @@ function handleAstroNavigation() {
 // Events von Astro + klassisches DOMContentLoaded
 document.addEventListener("astro:page-load", handleAstroNavigation);
 document.addEventListener("astro:after-swap", handleAstroNavigation);
+document.addEventListener("astro:before-swap", () => {
+  const main = document.querySelector("main[data-project-slug]");
+  if (!main) return;
+
+  sessionStorage.setItem("lastProjectSlug", main.dataset.projectSlug);
+  sessionStorage.setItem("lastProjectIndex", main.dataset.projectIndex);
+  sessionStorage.setItem("lastProjectTotal", main.dataset.projectTotal);
+});
 document.addEventListener("DOMContentLoaded", handleAstroNavigation);
 
 // Falls der DOM schon fertig ist (direkter Reload etc.)

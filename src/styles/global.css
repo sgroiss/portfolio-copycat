@@ -50,32 +50,6 @@
   column-gap: var(--gutter);
   row-gap: var(--space-l);
 }
-
-/* Standard-Karte: nimmt auf Desktop 6 von 12 Spalten, auf Mobile volle Breite */
-.work-item {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 768px) {
-  .work-item {
-    grid-column: span 6;
-  }
-}
-
-/* „Breite“ Karte: nimmt die ganze Breite ein (später können wir Offsets einbauen) */
-.work-item--wide {
-  grid-column: 1 / -1;
-}
-
-/* Offsets für „breite“ Items */
-.work-item--wide-left {
-  grid-column: 1 / span 10;
-}
-
-.work-item--wide-right {
-  grid-column: 3 / span 10;
-}
-
 /* ===== Tailwind v4: eigene Utilities ===== */
 @utility container {
   margin-inline: auto;
@@ -148,10 +122,6 @@ p:last-of-type {
 section {
   overflow: hidden;
   will-change: transform;
-}
-
-.next-project-teaser:hover {
-  background-color: var(--next-overlay-color);
 }
 
 /* RES HELPER -------------------------------------------- */

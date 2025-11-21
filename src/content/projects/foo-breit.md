@@ -1,5 +1,5 @@
 ---
-title: "Motion Experiments"
+title: "LALALALA"
 desc: "Variable Typography & generative Motion Design."
 img: "/images/placeholder/h-2.jpg"
 imgAlt: "ALT TEXT"
